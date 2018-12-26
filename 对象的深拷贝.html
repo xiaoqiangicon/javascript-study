@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script>
+    // 方法一：
+    var obj = {};
+    var newObj = JSON.parse( JSON.stringify(obj) );
+    // 适用于数组和对象，就是不能拷贝函数
+
+    // 方法二：
+    var deepCopy = function(obj) {
+      if(typeof obj !== 'object') return ;
+      var newObj = obj instanceof Array ? [] : {};
+      for( var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          newObj[key] = typeof obj[key] === 'object' ? deepCopy(obj[key]) : obj[key];
+        }
+      }
+      return newObj
+    }
+
+    // var deepCopy = function (obj) {
+    //   if( typeof obj !== 'object' ) return;
+    //   var newObj = obj instanceof Array ? [] : {};
+    //   for( var key in obj) {
+    //     if( obj.hasOwnProperty(key)) {
+    //       newObj[key] = typeof obj[key] === 'object' ? deepCopy(obj[key]) : obj[key];
+    //     }
+    //   }
+    //   return new Obj
+    // }
+  </script>
+</head>
+<body>
+  
+</body>
+</html>

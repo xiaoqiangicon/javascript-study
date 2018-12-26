@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script>
+    var event = {
+      clientList: [],
+      listen: function( key, fn ) {
+        if( !this.clientList[key] ) {
+          this.clientList[key] = [];
+        }
+        this.clientList[key].push(fn);
+      },
+      trigger: function() {
+        var key = Array.prototype.shift.call(arguments),
+            fns = this.clientList[key];   // 获取的事件列表数组
+
+        if(key === '*') {
+          for(var i = 0; i<this.clientList.length; i++) {
+            for(var j=0; j < this.clientList[i].length; j++, fn=this.clientList[i][j++]) {
+              fn.apply(this, arguments);
+            }
+          }
+        }
+        
+        if(!fns || fns.length === 0) {
+          return false;
+        }
+
+        for(var i=0, fn; fn = fns[i++];) {
+          fn.apply(this, arguments);
+        }
+      },
+      remove: function(key, fn) {
+        var fns = this.clientList[key];
+        
+        if(!fns) {
+          return false;
+        }
+        if(!fn) {
+          fns && (fns.length = 0);
+        }else {
+          for( var l = fns.length -1; l>=0; l--) {
+            var _fn = fns[l];
+            if(_fn === fn) {
+              fns.splice(l, 1);
+            }
+          }
+        }
+      }
+    }
+
+    var installEvent = function(obj) {
+      for(var i in event) {
+        obj[i] = event[i];
+      }
+    }
+
+    var salesOffices = {};
+    installEvent( salesOffices );
+
+    salesOffices.listen('squareMeter88', fn1 = function(price) {
+      console.log('price1 = ' + price);
+    });
+    salesOffices.listen('squareMeter88', fn2 = function(price) {
+      console.log('price2 = '+ price);
+    })
+    salesOffices.trigger( 'squareMeter88', 200000000);
+    salesOffices.trigger('squareMeter100', 30000000);
+    
+    salesOffices.remove('squareMeter88', fn1);
+    salesOffices.trigger('squareMeter88', 20000000);
+  </script>
+</head>
+<body>
+  
+</body>
+</html>

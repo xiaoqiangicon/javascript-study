@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script>
+    function curry(fn) {
+      var args = Array.prototype.slice.call(arguments, 1);
+      return function () {
+        var innerArgs = Array.prototype.slice.call(arguments);
+        var finnalArgs = innerArgs.cacat(args);
+        return fn.apply(null, finalArgs);
+      }
+    }
+
+    function curry(fn) {
+      var args = Array.prototype.slice.call(arguments, 1);
+      return function () {
+        // slice可以做到类数组转数组
+        var innerArgs = Array.prototype.slice.call(arguments);
+        var finnalArgs = innerArgs.concat(args);
+        console.log(innerArgs);
+        return fn.apply(null, finnalArgs)
+      }
+    }
+
+    function sum(a, b, c) {
+      console.log(a);
+      console.log(b);
+      console.log(c);
+    }
+
+    var sum2 = curry(sum, 1, 2);
+    sum2(3);
+  </script>
+</head>
+<body>
+  
+</body>
+</html>

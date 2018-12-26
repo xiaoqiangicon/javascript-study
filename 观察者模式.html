@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script>
+    var salesOffices = {};
+
+    salesOffices.clientList = {};
+
+    salesOffices.listen = function(key, fn) {
+      if(!this.clientList[key]) {
+        this.clientList[key] = [];
+      }
+      this.clientList[key].push(fn);
+    };
+
+    salesOffices.trigger = function() {
+      var key = Array.prototype.shift.call(arguments),
+          fns = this.clientList[key];
+
+      if(!fns || fns.length === 0) {
+        return false;
+      }
+      for(var i=0, fn; fn = fns[i++]; ) {
+        fn.apply(this, arguments);
+      }
+    }
+
+    salesOffices.listen('88', function(price, squareMeter) {
+      console.log('price= ' + price);
+      console.log('squareMeter= ' + squareMeter);
+    });
+    salesOffices.listen('110', function(price, squareMeter) {
+      console.log('price2= ' + price);
+      console.log('squareMeter= ' + squareMeter );
+    });
+
+    salesOffices.trigger( '88', 200000000 );
+    salesOffices.trigger( '110', 300000000);
+  </script>
+</head>
+<body>
+  
+</body>
+</html>

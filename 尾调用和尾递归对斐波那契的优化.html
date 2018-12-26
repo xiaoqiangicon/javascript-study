@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script>
+    function fibonacci(n, prev=1, next=1) { // 始终只有一个调用帧，不会发生栈溢出
+      if(n <= 1) return next
+      return fibonacci(n-1, next, prev + next)
+    }
+
+    function fibonacci2(n, prev=1, next=1) {
+      if(n <= 1) return next
+      return fibonacci(n-1, next, prev + next)
+    }
+
+    function fibonacci1(n) {  // 调用帧太多，超过50即发生栈溢出
+      if (n===0) return 0
+      if (n===1) return 1
+      return fibonacci1(n-1) + fibonacci1(n-2)
+    }
+
+    function fibonacci3(n, prev=1, next=1) {
+      if(n <= 1) return next;
+      return fibonacci(n-1, next, prev + next);
+    }
+
+    console.log(fibonacci(50))
+  </script>
+</head>
+<body>
+  
+</body>
+</html>

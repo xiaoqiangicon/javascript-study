@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script>
+    // 方式一： 工厂模式
+    function factoryCreate(name) {
+      var o = new Object();
+      o.name = name;
+      o.getName = function () {
+        console.log(this.name);
+      }
+      return o;
+    }
+    // 注意：工厂模式在创建对象的时候不需要使用new
+    // 对象无法识别，因为所有的实例都指向同一个原型
+
+    // 2 构造函数模式
+    function FuncCreate(name) {
+      this.name = name;
+      this.getName = function() {
+        console.log(this.name);
+      }
+    }
+    // 优点：实例可以识别为一个特定的实例
+    // 缺点：每次创建实例时，每个方法都要被创建一次
+
+    // 构造函数模式优化
+    function FuncCreate2(name) {
+      this.name = name;
+      this.getName = getName;
+    }
+    function getName() {
+      console.log(this.name);
+    }
+    // 解决了每个方法都要重新创建的问题，这不叫封装
+
+    // 3 原型模式
+    function protoCreate(name) {}
+    protoCreate.prototype.name = 'lee';
+    protoCreate.prototype.getName = function() {
+      console.log(this.name);
+    }
+    // 方法不会重新创建，但是所有的属性和方法都会共享，并且不能初始化参数
+
+    // 原型函数优化
+    function protoCreate2(name) {}
+    protoCreate2.prototype = {
+      name: 'lee',
+      getName: function() {
+        console.log(this.name);
+      }
+    }
+    // 封装性好了一点，但是重写了原型，丢失了constructor属性
+
+    // 再优化
+    function protoCreate3(name) {}
+    protoCreate3.prototype = {
+      constructor: protoCreate3,
+      name: 'lee',
+      getName: function() {
+        console.log(this.name);
+      }
+    }
+    // 实例可以通过constructor属性找到所属的构造函数
+    // 原型模式该有的缺点还是有
+
+    // 4 组合模式
+    function conbineCreate(name) {
+      this.name = name;
+    }
+    conbineCreate.prototype = {
+      constructor: conbineCreate,
+      getName: function() {
+        console.log(this.name);
+      }
+    }
+    // 该共享的共享，该私有的私有，使用最广泛的方式
+    // 缺点：有的人就是希望全部都写在一起，实现更好的封装性
+
+    // 动态原型模式
+    function varietyCreate(name) {
+      this.name = name;
+      if(typeof this.getName != 'function') {
+        varietyCreate.prototype.getName = function() {
+          console.log(this.name);
+        }
+      }
+    }
+    // 注意：使用动态原型模式时，不能用对象字面量重写原型
+
+    // 5 寄生构造函数模式
+    function parasiticCreate(name) {
+      this.name = name;
+      o.name = name;
+      o.getName = function () {
+        console.log(this.name);
+      }
+      return o;
+    }
+    var person1 = new parasiticCreate('lee');
+    console.log(person1 instanceof parasiticCreate) // false
+    console.log(person1 instanceof Object) // true
+    // 寄生-构造函数-模式，也就是说寄生在构造函数的一种方法
+    // 与工厂模式唯一的区别就是创建对象的时候需要使用new
+  </script>
+</head>
+<body>
+  
+</body>
+</html>
