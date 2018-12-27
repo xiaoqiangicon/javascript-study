@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script>
+  window.onload = function () {
+    class Mvvm {
+      constructor (option) {
+        this.$option = option || {}
+        this._proxyData(option.data, this) // 执行函数实现代理
+        new Observe(option.data);
+        new Compile(option.el, this);
+      }
+      _proxyData (obj, context) {
+        Object.keys(obj).forEach(key => {
+          Object.defineProperty(context, key, {
+            configurable: false,
+            enumberable: true,
+            get () {
+              return obj[key]
+            },
+            set (val) {
+              obj[key] = val
+            }
+          })
+        })
+      }
+    }
+
+    class Observe {
+      constructor (obj) {
+        Object.keys(obj).forEach(key => {
+          this.defineReactive(obj, key, obj[key])
+        })
+      }
+      defineReactive (obj, key, val) {
+        let initVal = val;
+        Object.defineProperty(obj, key, {
+          enumerable: true,
+          configurable: false,
+          get() {
+            return initVal
+          },
+          set(val) {
+            initVal = val
+            return initVal
+          }
+        })
+      }
+    }
+
+    let compileText = function(node, vm, str) {
+      let val = vm[str];
+      if(val) {
+        node.nodeValue = val
+      }
+    }
+
+    class Compile {
+      constructor(el, vm) {
+        let frag = this.node2Fragment(el);
+        this.vm = vm;
+        this.compileElement(frag);
+        el.appendChild(frag);
+      }
+      node2Fragment (el) {
+        let frag = document.createDocumentFragment()
+        let child
+        while (child = el.firstCChild) {
+          frag.appendChild(child);
+        }
+        return frag
+      }
+      compileElement(el) {
+        let childNodes = el.childNodes;
+        [].forEach.call(childNodes, (node) => {
+          if(this.isElementNode(node)) {
+            this.compileElement(node);
+          } else if(this.isTextNode(node)) {
+            let matchStr = this.isMustache(node.nodeValue);
+            if(matchStr) {
+              compileText(node, this.vm, matchStr);
+            }
+          }
+        })
+      }
+      
+      isElementNode(node) {
+        return node.nodeType === 1;
+      }
+      isTextNode(node) {
+        return node.nodeType === 3;
+      }
+      isMustache(str) {
+        if(!str) {
+          return null;
+        }
+        let reg = /\{\{(.*)\}\}/
+        let arr = str.match(reg);
+        return arr ? arr[1].replace(/\s/g, '') : null
+      }
+    }
+
+    let updateFn
+    let canMount
+    class Dep {
+      constructor() {
+        this.queue = []
+      }
+      mount () {
+        this.queue.push(updateFn);
+      }
+      notify () {
+        this.queue.forEach(fn => fn())
+      }
+    }
+
+    // test
+    let myMvvm = new Mvvm({
+      el: document.getElementById('app'),
+      data: {
+        someStr: 'hello world'
+      }
+    })
+    console.log(myMvvm.someStr);
+  }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <div>{{someStr}}</div>
+  </div>
+</body>
+</html>
