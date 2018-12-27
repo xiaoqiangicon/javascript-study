@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script>
+    function countRepeat(arr) {
+      arr.sort(function(n1, n2){
+        return n1 - n2;
+      })
+      
+      var obj = {};
+      for( var i = 0, len = arr.length; i < len; i++ ) {
+        if(!obj[arr[i]]) {
+          obj[arr[i]] = 1
+        } else {
+          obj[arr[i]]++;
+        }
+      }
+
+      return obj
+    }
+
+    var arr = [1, 2, 3, 4, 5];
+    var new_arr = arr.filter(function(value, index) {
+      return value > 3;
+    })
+
+    arr.forEach(function(value, index) {
+      // console.log(index, value)
+    })
+
+    var new_arr2 = arr.map(function(value, index) {
+      return value + 3
+    })
+    
+
+    function flattenMd(arr) {
+      var result = []
+      function flatten (arr) {
+        for( var i = 0; i < arr.length; i++) {
+          if(Array.isArray(arr[i])) {
+            flatten(arr[i]);
+          }else{
+            result.push(arr[i]);
+          }
+        }
+      }
+      flatten(arr);
+      return result;
+    }
+
+    function flatten2d(arr) {
+      flatten = (arr) => [].concat(...arr);
+      return flatten(arr.map(x=>Array.isArray(x)?flatten2d(x):x))
+    }
+
+    function flatten2d(arr) {
+      flatten = (arr) => [].concat(...arr);
+      return flatten(arr.map(x=>Array.isArra(x) ? flatten2d(x) : x))
+    }
+
+    function isEmptyObj(obj) {
+      for(var i in obj) {
+        return false;
+      }
+      return true;
+    }
+    function isEmptyObj2(obj) {
+      if(JSON.stringify(obj) === '{}') {
+        return true
+      }
+      return false;
+    }
+    function isEmptyObj3(obj) {
+      if(Object.keys(object).length === 0) {
+        return true;
+      }
+      return false;
+    }
+
+    console.log(new Date('12-28-2018') - new Date('11-28-2018'))
+  </script>
+</head>
+<body>
+  
+</body>
+</html>

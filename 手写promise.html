@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script>
+    const PENDING = 'pending';
+    const FULFILLED = 'fulfilled';
+    const REJECTED = 'rejected';
+
+    function Promise (excutor) {
+      let that = this; // 缓存当前promise实例
+      this.status = PENDING; //初始状态
+      this.value = undefined; // fulfilled状态时，返回的信息
+      this.reason = undefined; // rejected状态时，拒绝的原因
+      this.onFulfilledCallbacks = []; // 储存fulfilled状态对应的onFulfilled函数
+      this.onRejectedCallbacks = []; // 储存rejected状态对应的onRejected函数
+
+      function resolve(value) {
+        if(value instanceof Promise) { // value成功态时接收的终值
+          return value.then(resolve, reject);
+        }
+
+        setTimeout(() => {
+          if(that.status === PENDING) {
+            that.status = FULFILLED;
+            that.value = value;
+            that.onFulfilledCallbacks.forEach(cb => cb(that.value));
+          }
+        })
+        // 为什么resolve加setTimeout
+      }
+
+      function reject(reason) {
+        setTimeout(() => {
+          if(that.status === PENDING) {
+            that.status = REJECTED;
+            that.reason = reason;
+            that.onRejectedCallbacks.forEach(cb => cb(that.reason))
+          }
+        })
+      }
+
+      // 捕获在excutor执行器中抛出的异常
+      try {
+        excutor(resolve, reject)
+      } catch(e) {
+        reject(e);
+      }
+    }
+
+    function resolvePromise(promise2, x, resolve, reject) {
+      if(promise2 === x) { // 如果从onFulfilled中返回的x就是promise2就会导致循环引用报错
+        return reject(new TypeError('循环引用'))
+      }
+
+      let called = false;
+
+      if( x instanceof Promise) {
+        if(x.status === PENDING) {
+          x.then(y => {
+            resolvePrmise(promise2, y, resolve, reject);
+          }, reson = {
+            reject(reson)
+          })
+        } else {
+          x.then(resolve, reject)
+        }
+      } else if( x !== null && ((typeof x === 'object') || (typeof x=== 'function'))) {
+        try {
+          let then = x.then;
+          if (typeof then === 'function') {
+            then.call(x, y => {
+              if(called) return;
+              called = true;
+              resolvePromise(promise2, y, resolve, reject);
+            }, reason => {
+              if(called) return;
+              called = true;
+              reject(reson);
+            })
+          } else {
+            resolve(x);
+          }
+        } catch(e) {
+          if(called) return;
+          called = true;
+          reject(e);
+        }
+      } else {
+        resolve(x);
+      }
+    }
+
+    Promise.prototype.then = function(onFulfilled, onRejected) {
+      const that = this;
+      let newPromise; // 处理参数默认值，保证参数后续能够继续执行
+      onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : value => value;
+      onRejected = typeof onRejected === 'function' ? onRejected : reson => {
+        throw reason;
+      }
+
+      if( that.status === FULFILLED ) {
+        return newPromise = new Promise((resolve, reject) => {
+          setTimeout(() => {
+            try {
+              let x = onFulfilled(that.value);
+              resolvePromise(newPromise, x, resolve, reject); //新的promise resolve
+            } catch(e) {
+              reject(e); // 捕获前面onFulfilled中抛出的异常
+            }
+          })
+        })
+      }
+
+      if (that.status === REJECTED) {
+        return newPromise = new Promise((resolve, reject) {
+          setTimeout(() => {
+            try{
+              let x = onRejected(that.reason);
+              resolvePromise(newPromise, x, resolve, reject);
+            } catch(e) {
+              reject(e);
+            }
+          })
+        })
+      }
+
+      if( that.status === PENDIN ) {
+        return newPromise = new Promise((resolve, reject0 => {
+          that.onFulfilledCallbacks.push((value) => {
+            try {
+              let x = onFulfilled(value);
+              resolvePromise(newPromise, x, resolve, reject);
+            } catch(e) {
+              reject(e);
+            }
+          })
+
+          that.onRejectedCallbacks.push((reason) => {
+            try {
+              let x = onRejected(reason);
+              resolvePromise(newPromise, x, resolve, reject);
+            } catch(e) {
+              reject(e);
+            }
+          })
+        }))
+      }
+    }
+  </script>
+</head>
+<body>
+  
+</body>
+</html>
