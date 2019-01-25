@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+      * {padding:0; margin: 0;}
+      .text {background: pink;margin-left: 10px;margin-top: 10px;padding-left: 20px;padding-top: 20px;width: 200px;}
+  </style>
+  <script>
+	window.onload = function() {
+    var oSpan = document.getElementsByClassName('text')[0];
+
+    oSpan.onclick = function () {
+      console.log(111)
+      localStorage.setItem('username', 'lee');
+      
+      oApp.innerHTML = localStorage.getItem('username');
+    }
+    var oApp = document.getElementById('app');
+	}
+
+  </script>
+</head>
+<body>
+	<div id="app"></div>
+  <span class="text">hello</span>
+</body>
+</html>

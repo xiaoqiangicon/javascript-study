@@ -52,6 +52,22 @@
       return result;
     }
 
+    function flattenMd(arr) {
+      var result = [];
+      function flatten (arr) {
+        for(var i = 0; i< arr.length; i++) {
+          if(Array.isArray(arr[i])) {
+            flatten(arr[i]);
+          } else {
+            result.push(arr[i]);
+          }
+        }
+      }
+      flatten(arr);
+      return result;
+    }
+    console.log(flattenMd([1, [2, [3, [4, [5]]]]]))
+
     function flatten2d(arr) {
       flatten = (arr) => [].concat(...arr);
       return flatten(arr.map(x=>Array.isArray(x)?flatten2d(x):x))

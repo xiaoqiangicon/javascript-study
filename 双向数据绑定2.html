@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script>
+    function nodeToFragment(node, vm) {
+      var flag = document.createDocumentFragment();
+      var child;
+
+      while (child = node.firstChild) {
+        compile(child, vm)
+        flag.appendChild(child);
+      }
+
+      return flag;
+    }
+
+    function defineReactive(obj, key, val) {
+      Object.defineProperty(obj, key, {
+        get: function () {
+          return val
+        },
+        set: function (newVal) {
+          if (newVal === val) return;
+          val = newVal;
+          console.log(val);
+        }
+      })
+    }
+
+    function observe (obj, vm) {
+      Object.keys(obj).forEach(function(key) {
+        defineReactive(vm, key, obj[key]);
+      })
+    }
+
+    function Vue(options) {
+      this.data = options.data;
+      var data = this.data;
+
+      observe(data, this);
+
+      var id = options.el;
+      var dom = nodeToFragment(document.getElementById('app'));
+      document.getElementById(id).appendChild(dom);
+    }
+
+    function compile(node, vm) {
+      var reg = /\{\{(.*)\}\}/;
+
+      if(node.nodeType === 1) {
+        var attr = node.attributes;
+
+        for (var i = 0; i < attr.length; i++ ){
+          if (attr[i].nodeName == 'v-model') {
+            var name = attr[i].nodeValue;
+            node.addEventListener('input', function() {
+              vm[name] = e.target.value;
+            });
+            node.value = vm[name];
+            node.removeAttribute('v-model');
+          }
+        }
+      }
+
+      if( node.nodeType === 3) {
+        if(reg.test(node.nodeValue)) {
+          var name = RegExp.$1;
+          name = name.trim();
+          node.nodeValue = vm[name];
+        }
+      }
+    }
+
+    var vm = new Vue({
+      el: 'app',
+      data: {
+        text: 'hello world'
+      }
+    })
+  </script>
+</head>
+<body>
+  <div id="app">
+    <input type="text">
+    <span id="b"></span>
+  </div>
+</body>
+</html>

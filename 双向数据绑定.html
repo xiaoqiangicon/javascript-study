@@ -9,7 +9,7 @@
   window.onload = function () {
     class Mvvm {
       constructor (option) {
-        this.$option = option || {}
+        this.$option = option || {} // 可使用this.$el访问属性
         this._proxyData(option.data, this) // 执行函数实现代理
         new Observe(option.data);
         new Compile(option.el, this);
@@ -125,13 +125,27 @@
         someStr: 'hello world'
       }
     })
-    console.log(myMvvm.someStr);
+    // console.log(myMvvm.someStr);
+
+    function nodeToFragment(node) {
+      var flag = document.createDocumentFragment();
+      var child;
+      while (child = node.firstChild) {
+        console.log(child)
+        flag.appendChild(child);
+      }
+      return flag;
+    }
+    var dom = nodeToFragment(document.getElementById('app'));
+    console.log(dom);
+    // document.getElementById('app').appendChild(dom);
   }
   </script>
 </head>
 <body>
   <div id="app">
     <div>{{someStr}}</div>
+    <span id="b"><span>hello</span></span>
   </div>
 </body>
 </html>

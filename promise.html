@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script>
+    const PENDING = Symbol('pending');
+    const FULFILLED = Symbol('fulfilled');
+    const REJECTED = Symbol('rejected');
+
+    var promiseAsyncFunc = function() {
+      var status = PENDING
+      var fulfillCallback
+      var rejectCallback
+      var value
+
+      return {
+        fulfill: function(_value) {
+          if (status !== PENDING) return
+          value = makeThenable(_value, FULFILLED) // 保证当前promise为thanable
+          status = FULFILLED
+          if(typeof fulfillCallback === 'function') {
+            // fulfillCallback(value);
+            // status = FULFILLED
+            value.then(fulfillCallback)
+          }
+        },
+        reject: function(err) {
+          if (status !== PENDING) return
+          value = makeThenable(err, REJECTED) // 保证当前promise为thenable
+          status = REJECTED
+          if (typeof rejectCallback === 'function') {
+            // rejectCallback(err);
+            /// status = REJECTED
+            value.then(null, rejectCallback)
+          }
+        },
+        promise: {
+          then: function(_fulfillCallback, _rejectCallback) {
+          //   if (status === REJECTED) {
+          //     _rejectCallback(value)
+          //     return
+          //   }
+          //   if (status === FULFILLED) {
+          //     _fulfillCallback(value)
+          //     return
+          //   }
+          //   fulfillCallback = _fulfillCallback
+          //   rejectCallback = _rejectCallback
+          // }
+          let newPromiseAsyncFunc = promiseAsyncFunc()
+          let fulfillFunc = function(value) {
+            newPromiseAsyncFunc.fulfill(_fulfillCallback(value))
+          }
+          let rejectFunc = function(err) {
+            newPromiseAsyncFunc.fulfill(_rejectCallback(err))
+          }
+          if(status === PENDING) {
+            fulfillCallback = fulfillFunc
+            rejectCallback = rejectFunc
+          } else {
+            value.then(fulfillFunc, rejectFunc)
+          }
+          return newPromiseAsyncFunc.promise
+        }
+      }
+    }
+  }
+
+    function makeThenable(value, status) {
+      if(value && typeof value.then === 'function') {
+        return value
+      }
+      if (status === FULFILLED) {
+        return {
+          then: function(fulfillCallback, rejectCallback) {
+            return makeThenable(fulfillCallback(value), FULFILLED)
+          }
+        }
+      }
+      if (status === REJECTED) {
+        return {
+          then: function(fulfillCallback, rejectCallback) {
+            return makeThenable(rejectCallback(value), REJECTED)
+          }
+        }
+      }
+    }
+
+    let ownPromise = function(asyncCall) {
+      let defer = promiseAsyncFunc()
+      asyncCall(defer.fulfill, defer.reject)
+      return defer.promise
+    }
+
+    ownPromise(function(fulfill, reject) {
+      setTimeout(() => {
+        var randomNumber = Math.random()
+        if (randomNumber > 0.5) fulfill(randomNumber)
+        else reject(randomNumber);
+      }, 1000)
+    }).then(data => {console.log(data); return 'return value in then1 fulfill'}, err => console.log(err))
+    .then( data => {console.log(data); return 'return value in the2 fulfill'}, err => { console.log(err); return 'return value in then2 reject'})
+    .then(data=>{console.log(data)}, err=>{console.log(err)})
+  </script>
+</head>
+<body>
+  
+</body>
+</html>
