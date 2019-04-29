@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script>
+    var f = function (s) {
+      return s.replace(/-\w/g, function(x) {
+        console.log(x);
+        return x.slice(1).toUpperCase();
+      })
+    }
+
+    var s = 'get-element-id';
+    console.log(f(s));
+  </script>
+</head>
+<body>
+  
+</body>
+</html>
